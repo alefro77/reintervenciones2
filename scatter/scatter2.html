@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.dot {
+  stroke: #000;
+  stroke-opacity: .7;
+  fill-opacity: .7;
+  cursor:pointer;
+}
+
+#controls {
+  font-size: 14px;
+  position: absolute;
+<<<<<<< HEAD
+  top: 400px;
+  left: 1000px;
+=======
+  top: 10px;
+  left: 40px;
+>>>>>>> 9e42dfa7c02848e34d4baa46f1c8b445d087e973
+}
+
+input {
+  margin: 4px 4px 0;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: #fff899;
+  width: 100px;
+  border-radius: 2px;
+}
+
+
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: #fff;
+  content: #0013ef;
+  position: absolute;
+  text-align: center;
+}
+.legend{
+  cursor: pointer
+}
+
+
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+.aum{
+  width: 25;
+  height: 30;
+}
+
+</style>
+<body>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script>
+
+<<<<<<< HEAD
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 1000 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom,
+=======
+var margin = {top: 50, right: 40, bottom: 30, left: 40},
+    width = 1200 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom,
+>>>>>>> 9e42dfa7c02848e34d4baa46f1c8b445d087e973
+    padding = 1, // separation between nodes
+    lengedSpace = 200,
+    radius = 6;
+var format = d3.format("$,");
+    
+var x = d3.scale.linear()
+    .range([0, width-200]);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var color = d3.scale.category10();
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(5);
+    
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickFormat(format);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right + lengedSpace)
+    .attr("height", height + margin.top + margin.bottom )
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var controls = d3.select("body").append("label")
+    .attr("id", "controls");
+var checkbox = controls.append("input")
+    .attr("id", "collisiondetection")
+    .attr("type", "checkbox");
+controls.append("span")
+    .text("Collision detection");
+    
+
+
+ var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 150])
+  .html(function(d) {
+    return "<strong>Procedimiento:</strong> <span>" + d.nomProc + "</span><br> <strong>Reintervenciones:</strong> <span>" + d.reintervenciones + "</span><br> <strong>Costo:</strong> <span>" + format(d.costo) + "</span>";
+  })
+  .hide(function(d){
+    console.log("ido");
+  })
+  svg.call(tip);
+  
+
+d3.json("../fileDi.json", function(error, data) {
+    if (error) throw error;
+  var ft = {}, k = 0, arrproc = {}; tpac = {};
+  data.forEach(function(p){
+      tpac[p.id]= p;
+      for(var c in p["cirugias"]){
+        var ini = [];
+        var hj = p["cirugias"][c].hijas.length;
+        var val = 0
+        for(var v in p["cirugias"][c].hijas) 
+          val+=p["cirugias"][c].hijas[v].valorfactura;
+        for(var j in p["cirugias"][c]["procedimientos"]){
+          var k = p["cirugias"][c]["procedimientos"][j];
+          if (ini.indexOf(k.nomProc) == -1) ini.push(k.nomProc)
+          if(!ft[k["especialidad"]]) ft[k["especialidad"]] = {};
+          if(!ft[k["especialidad"]][k["nomProc"]]) ft[k["especialidad"]][k["nomProc"]] = {"reint": 0, "valor": 0};
+          if(!arrproc[k["nomProc"]]) arrproc[k["nomProc"]] = k["especialidad"];
+        }
+        for(var z in ini){
+          ft[arrproc[ini[z]]][ini[z]]["reint"] += hj;
+          ft[arrproc[ini[z]]][ini[z]]["valor"] += val;
+        }
+      }
+  });
+  datos = [];
+  var pc = {}, cons = 0;
+  for (var i in ft){
+    pc[i] = "A" + cons; cons++;
+    for(var j in ft[i]){
+      if(ft[i][j].reint>0){
+        datos.push({"nomProc": j, "especialidad": i, "reintervenciones": ft[i][j].reint, "costo":  ft[i][j].valor})
+      }
+      
+    }
+  }
+
+
+  var force = d3.layout.force()
+    .nodes(datos)
+    .size([width, height])
+    .on("tick", tick)
+    .charge(1)
+    .gravity(0)
+    .chargeDistance(20);
+
+  x.domain(d3.extent(datos, function(d) { return d.costo; })).nice();
+  y.domain([0,50]).nice();
+
+  // Set initial positions
+  datos.forEach(function(d) {
+    d.x = x(d.costo);
+    d.y = y(d.reintervenciones);
+    d.color = color(d.especialidad);
+    d.radius = radius;
+  });
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("x", width-200)
+      .attr("y", -6)
+      .style("text-anchor", "end")
+      .text("Costo de las reintervenciones");
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Número de reintervenciones")
+
+  var node = svg.selectAll(".dot")
+      .data(datos)
+    .enter().append("circle")
+      .attr("class", function(d){ return "dot " + pc[d.especialidad]})
+<<<<<<< HEAD
+       .on('mouseover',tip.show)
+   .on('mouseout', tip.hide)
+=======
+       .on('mouseover', function(d){
+          tip.show(d);
+          d3.selectAll("rect").attr("opacity", 0.2);
+          d3.select(".L" + pc[d.especialidad]).attr("opacity", 1);
+       }) 
+   .on('mouseout', function(d){
+      tip.hide(d);
+      d3.selectAll("rect").attr("opacity", 1);
+    })
+>>>>>>> 9e42dfa7c02848e34d4baa46f1c8b445d087e973
+      .attr("r", radius)
+      .attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; })
+      .style("fill", function(d) { return d.color; })
+
+
+      
+ var legend = svg.selectAll(".legend")
+      .data(color.domain())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });             
+
+  legend.append("rect")
+      .attr("x", width + lengedSpace - 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color)
+      .attr("class", function(d){ return "L" + pc[d] })
+      .on('mouseover', function(d){
+        d3.select(this).attr("width", "20").attr("height", "20");
+        d3.selectAll(".dot").attr("opacity", 0.2);
+        d3.selectAll("." + pc[d]).attr("opacity", 1);
+      })
+      .on('mouseout', function(d){
+        d3.select(this).attr("width", "18").attr("height", "18");
+        d3.selectAll(".dot").attr("opacity", 1);
+       })
+
+  legend.append("text")
+      .attr("x", width + lengedSpace - 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
+
+
+  d3.select("#collisiondetection").on("change", function() {
+   force.resume();
+  });
+
+  force.start();
+
+  function tick(e) {
+    node.each(moveTowardDataPosition(e.alpha));
+
+    if (checkbox.node().checked) node.each(collide(e.alpha)); 
+    
+    node.attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; });
+  }
+
+  function moveTowardDataPosition(alpha) {
+    return function(d) {
+      d.x += (x(d.costo) - d.x) * 0.1 * alpha;
+      d.y += (y(d.reintervenciones) - d.y) * 0.1 * alpha;
+    };
+  }
+
+  // Resolve collisions between nodes.
+  function collide(alpha) {
+    var quadtree = d3.geom.quadtree(datos);
+    return function(d) {
+      var r = d.radius + radius + padding,
+          nx1 = d.x - r,
+          nx2 = d.x + r,
+          ny1 = d.y - r,
+          ny2 = d.y + r;
+      quadtree.visit(function(quad, x1, y1, x2, y2) {
+        if (quad.point && (quad.point !== d)) {
+          var x = d.x - quad.point.x,
+              y = d.y - quad.point.y,
+              l = Math.sqrt(x * x + y * y),
+              r = d.radius + quad.point.radius + (d.color !== quad.point.color) * padding;
+          if (l < r) {
+            l = (l - r) / l * alpha;
+            d.x -= x *= l;
+            d.y -= y *= l;
+            quad.point.x += x;
+            quad.point.y += y;
+          }
+        }
+        return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+      });
+    };
+  }
+
+});
+
+</script>

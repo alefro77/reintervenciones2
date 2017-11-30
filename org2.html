@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pacientes</title>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/d3-queue/3.0.3/d3-queue.js'></script>
+  <script src="http://momentjs.com/downloads/moment.min.js"></script>
+  <style type="text/css">
+      
+      tr td{
+        vertical-align: text-top;
+        font-size: 10px;
+      }
+      .tdesc td{
+        border-top: 1px solid;
+      }
+
+  </style>
+</head>
+<body>
+
+<div id="accordion">
+  
+</div>
+<script>
+    function dias(fechaIni, fechaFin)
+    {
+      
+      var fecha1 = new Date(fechaIni.substring(6,10),fechaIni.substring(3,5),fechaIni.substring(0,2));
+      var fecha2 = new Date(fechaFin.substring(6,10),fechaFin.substring(3,5),fechaFin.substring(0,2));
+
+      var dias = Math.round(diasDif/(1000 * 60 * 60 * 24));
+      var diasDif = fecha2.getTime() - fecha1.getTime();
+      return dias + 1;
+    }  
+    //Organizar los datos
+    var arrTot = {};
+    function drawEvery(error, d){
+      $("#accordion").html("");
+      console.log(d);
+
+      var i = 1; var reint = 0;
+      for(var k in d){
+          //if(["Ij9Oj", "FXnMI", "pAKqI", "hfHCs", "jFQEd", "Ij9Oj"].indexOf(d[k].id) > -1){
+          var txt = "<h3>" +  i + " Paciente: " + d[k].id + " Reintervenciones: " + d[k].reint + "</h3><div><table>";
+          var t = 1;
+          for(j in d[k]["cirugias"]){
+            var cir = d[k]["cirugias"][j];
+            txt = txt + '<tr class="tdesc"><td rowspan="5">' + t + '</td><td>Fecha:</td><td>' +  cir.fecha + '</td></tr>';
+            txt = txt +  '<tr><td>Valor:</td><td>' +  cir.valorfactura + '</td></tr>';
+            txt = txt +  '<tr><td>Dias han pasado:</td><td>' +  cir.daysPast + '</td></tr>';
+            txt = txt +  '<tr><td>Proc Indice:</td><td> Especialidad: ' +  cir.indice.esp + ' -- Procedimiento: ' + cir.indice.proc + '</td></tr>';
+            txt = txt +  '<tr><td>Procedimientos:</td><td>';
+            for(var h in cir.procedimientos){
+               var pro = cir.procedimientos[h];
+               txt = txt +  '<div>Especialidad: ' + pro.especialidad + ' -- Procedimiento ' + pro.nomProc + '</div>';
+            }
+            txt = txt + '</td></tr>';
+            t++;
+          }
+          txt = txt + "</table></div>";
+          
+          $("#accordion").append(txt);
+
+          i++;
+        //}
+       } 
+        
+      
+      $( "#accordion" ).accordion({
+        heightStyle: "content",
+        collapsible: true
+      });
+     
+      
+    }
+    $("#accordion").html("Cargando datos");
+    d3.queue()
+      .defer(d3.json, 'filePac.json')
+      .await(drawEvery)
+
+
+  </script>
+ 
+
+ 
+ 
+</body>
+</html>
