@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <style>
+  .svgi{
+    font-size: 10px;
+    font-family: "Times New Roman", Georgia, Serif;
+    text-transform: uppercase;
+  }
+  .gt text{
+    cursor: pointer
+  }
+  .svgtit{
+    position: relative;
+  }
+  .svgtit span{
+    height: 20px;
+    width: 500px;
+    vertical-align: middle;;
+    border: 0px;
+    border-radius: 0px 100px 100px 0px;
+    font-weight: bold;
+    padding-top: 2px;
+    font-size: 10px;
+    margin-left: 10px;
+    padding: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+    color:white;
+}
+
+
+  </style>
+
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Reintervenciones Quirurgicas</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/full-width-pics.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+
+    <!-- Content section -->
+    <section class="py-5">
+      <div class="container">
+        <h1>Reintervenciones en el Hospital Militar Central</h1>
+        <p class="lead">¿Cuál es el procedimiento que genera más reintervenciones y mayores costos?</p>
+        <p>A partir del reporte de procedimientos del Hospital Militar Central se calcularon las reintervenciones que genera cada uno de los procedimientos. En la siguiente gráfica se muestra el resultado en el que se evidencia que el procedimiento de "Ventriculostomia drenaje externo" es el que ha generado el mayor número de reintervenciones mayores costos causados por estas.</p>
+        
+      </div>
+      
+    </section>
+
+    <!-- Image Section - set the background image for the header in the line below -->
+    <section class="py-5 bg-image-full">
+      <!-- Put anything you want here! There is just a spacer below for demo purposes! -->
+      
+    </section>
+
+
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Copyright &copy; 2017</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="../d3.v4.min.js"></script>
+<script src="../d3-tip.js"></script>
+<script>
+
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 1000 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom,
+    padding = 1, // separation between nodes
+    lengedSpace = 200,
+    radius = 6;
+var format = d3.format("$,");
+
+//Scatter Plot elements    
+var x = d3.scaleLinear()
+    .range([0, width]);
+
+var y = d3.scaleLinear()
+    .range([height, 0]);
+
+var colore = d3.scaleOrdinal(d3.schemeCategory10)
+ck = d3.scaleOrdinal(d3.schemeCategory20c)
+var colorg = {"MASCULINO": "#316395", "FEMENINO": "#ff9896"}
+function color(dk){
+  if(colorg[dk]) return colorg[dk];
+  else return ck(dk)
+}
+//var color = d3.scaleOrdinal(d3.schemeCategory20)
+
+
+var yAxis = d3.axisLeft(y)
+    .ticks(5);
+    
+var xAxis = d3.axisBottom(x)
+    .tickFormat(format);
+
+//SVG para scatter
+var svg = d3.select(".container").append("svg")
+    .attr("class", "svgscatter")
+    .attr("width", width + margin.left + margin.right + lengedSpace)
+    .attr("height", height + margin.top + margin.bottom )
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+//Controles Scatter
+var controls = d3.select("body").append("label")
+    .attr("id", "controls");
+var checkbox = controls.append("input")
+    .attr("id", "collisiondetection")
+    .attr("type", "checkbox");
+controls.append("span")
+    .text("Detección de colisiones");
+var tip = d3.tip()
+    .attr('class', 'd3-tip')
+    .offset([-10, 150])
+    .html(function(d) {
+    return "<strong>Procedimiento:</strong> <span>" + d.nomProc + "</span><br> <strong>Reintervenciones:</strong> <span>" + d.reintervenciones + "</span><br> <strong>Costo:</strong> <span>" + format(d.costo) + "</span>";
+  })
+  svg.call(tip);
+  
+// End Defintions Scatter plot
+
+
+//Svg para icicle
+var mtop = 20, wi = 300, hi = 400;
+var tra = d3.transition()
+      .duration(2000);
+var colorg = {"MASCULINO": "#316395", "FEMENINO": "#ff9896"} 
+    
+var svgtit = d3.select(".container").append("div")
+    .attr("class", "svgtit")
+    .attr("width", width)
+    .attr("height", mtop)
+    .style("left", (margin.left + wi) + "px")
+    .style("top", (2*margin.top) + "px");
+var svgi = d3.select(".container").append("svg")
+    .attr("class", "svgi")
+    .attr("width", (wi + margin.left))
+    .attr("height", (hi)).attr("transform", "translate(0,0)");
+var gt = svgi.append("svg").attr("class", "gt")
+    .attr("width", (wi)).attr("height", mtop).attr("transform", "translate(" + margin.left + ",0)");    
+var gi = svgi.append("svg")
+    .attr("width", wi).attr("height", hi).attr("transform", "translate(" + margin.left + "," + margin.top + ")"); 
+var gtot = svgi.append("svg").attr("class", "gtot")
+    .attr("width", (wi/4)).attr("height", hi).attr("transform", "translate(" + margin.left + ",0)");
+          
+var partition = d3.partition()
+    .size([hi, wi])
+    .padding(0)
+    .round(true);
+
+
+var wc = 400, wl = 300;
+var hc = 400, hl = 600;
+svgtit.append("span").attr("class", "sp ultimo").text("heyy");
+svgtit.append("span").attr("class", "deep1 sp sp1")
+svgtit.append("span").attr("class", "deep2 sp sp1")
+svgtit.append("span").attr("class", "deep3 sp sp1")   
+
+var svgbubble = d3.select("body").append("svg")
+    .attr("width", wc)
+    .attr("height", hc)
+    .attr("transform", "translate("+ (wc+10) +", 150)")
+    .attr("class", "svgbuble")
+
+var divlegend = d3.select("body").append("div")
+    .style("width", wl + "px")
+    .style("height", hl + "px")
+    .attr("class", "legend").style("left", (wi+wc) + "px").style("top", "150px")
+var divproc = d3.select("body").append("div")
+    .style("width", wl + "px")
+    .style("height", 200 + "px")
+    .attr("class", "divproc").style("left", wi + "px").style("top", "610px")  
+
+var divpac = d3.select("body").append("div")
+    .attr("id", "divpac")
+    .style("width", "300px")
+    .style("height", "600px")
+    .attr("class", "divpac").style("left", "1500px").style("top", mtop + "px") 
+    .style("overflow-y", "scroll")  
+var pack = d3.pack()
+    .size([width - 2, height - 2])
+    .padding(3);           
+
+//End Icicle
+
+
+d3.json("../fileDi.json", function(error, data) {
+    if (error) throw error;
+
+  var ft = {}, k = 0, arrproc = {}; tpac = {};
+  data.forEach(function(p){
+      tpac[p.id]= p;
+      for(var c in p["cirugias"]){
+        var ini = [];
+        var hj = p["cirugias"][c].hijas.length;
+        var val = 0
+        for(var v in p["cirugias"][c].hijas) 
+          val+=p["cirugias"][c].hijas[v].valorfactura;
+        for(var j in p["cirugias"][c]["procedimientos"]){
+          var k = p["cirugias"][c]["procedimientos"][j];
+          if (ini.indexOf(k.nomProc) == -1) ini.push(k.nomProc)
+          if(!ft[k["especialidad"]]) ft[k["especialidad"]] = {};
+          if(!ft[k["especialidad"]][k["nomProc"]]) ft[k["especialidad"]][k["nomProc"]] = {"reint": 0, "valor": 0};
+          if(!arrproc[k["nomProc"]]) arrproc[k["nomProc"]] = k["especialidad"];
+        }
+        for(var z in ini){
+          ft[arrproc[ini[z]]][ini[z]]["reint"] += hj;
+          ft[arrproc[ini[z]]][ini[z]]["valor"] += val;
+        }
+      }
+  });
+  datos = [];
+  var pc = {}, cons = 0;
+  for (var i in ft){
+    pc[i] = "A" + cons; cons++;
+    for(var j in ft[i]){
+      if(ft[i][j].reint>0){
+        datos.push({"nomProc": j, "especialidad": i, "reintervenciones": ft[i][j].reint, "costo":  ft[i][j].valor})
+      }
+      
+    }
+  }
+  console.log(datos)
+
+  function updateAll(niveles, year){
+
+  //Para el Icicle
+
+      var arr = {}
+      data.forEach(function(k){
+        if(!arr[k[niveles[0]]]) arr[k[niveles[0]]] = {}
+        if(!arr[k[niveles[0]]][k[niveles[1]]]) arr[k[niveles[0]]][k[niveles[1]]] = {}
+        if(!arr[k[niveles[0]]][k[niveles[1]]][k[niveles[2]]]) arr[k[niveles[0]]][k[niveles[1]]][k[niveles[2]]] = 0
+        arr[k[niveles[0]]][k[niveles[1]]][k[niveles[2]]]++ 
+      })
+      arr2 = {};
+      arr2["pacientes"] = (niveles[0])? arr: d.length;
+      var root = arr2;
+
+      root = d3.hierarchy(d3.entries(root)[0], function(d) {
+          return d3.entries(d.value)
+      })
+        .sum(function(d) { 
+            return d.value;
+        })
+      .sort(function(a, b) { return b.value - a.value; });
+      partition(root);
+
+      var init = [], finit = [];
+      var w = 0;    
+      var tit = gt.selectAll("text")
+      .data(niveles)
+      var rect = gi.selectAll("rect").data(root.descendants());
+      rect.attr("x", function(d) { return d.y0; })
+          .attr("y", function(d) { return d.x0})
+          .attr("width", function(d) { w = d.y1 - d.y0; return w; })
+          .attr("height", function(d) { return d.x1 - d.x0; })
+          .attr("fill", function(d) {  return color(d.data.key); })
+          .attr("lev", function(d){  return d.depth})
+      rect = rect.enter().append("rect")
+          .attr("x", function(d) { return d.y0; })
+          .attr("y", function(d) { return d.x0})
+          .attr("width", function(d) { w = d.y1 - d.y0; return w; })
+          .attr("height", function(d) { return d.x1 - d.x0; })
+          .attr("fill", function(d) { return color(d.data.key); })
+          .attr("lev", function(d){  return d.depth})
+          .on("dblclick", function(d){
+            d3.selectAll("rect").each(function(k){
+              if(d3.select(this).attr("lev") > d.depth)
+                d3.select(this).classed("litrect", true)
+
+            })
+            d3.selectAll(".litrect").attr("pointer-events", "none")
+          })
+          .on("click", clicked)
+          .on("mouseover", over)
+          .on("mouseout", function(){
+            if(d3.event.x > width || d3.event.y < mtop || d3.event.y > (mtop + height)){
+              d3.selectAll(".litrect").attr("pointer-events", "auto")
+            }
+          })
+
+       var pos = [[w,2*w], [2*w,3*w], [3*w,4*w]];      
+
+      gtot.append("text").text("TOTAL PACIENTES").attr("x", -(mtop + (hi/2) + 50)).attr("y", 25).attr("transform", "rotate(-90)").attr("class", "total").style("fill", "white").style("font-size", "14px"); 
+
+
+      //Enter de los titulos de los niveles
+      tit.transition(tra)
+          .attr("y", (mtop-10))
+          .attr("x", function(d, i) { k = (w/2) + pos[i][0] - (d.length + 2)*3; return k; })
+          .text(function(d){ return "- " + d + "-" })
+      tit = tit.enter().append("text")
+            .attr("y", (mtop-10))
+            .attr("x", function(d, i) { k = (w/2) + pos[i][0] - (d.length + 2)*3; return k; })
+            .text(function(d){ return "- " + d + "-" })
+            .call(d3.drag()
+              .on("start", dragstarted)
+              .on("drag", dragged)
+              .on("end", dragended))
+            .attr("class", "dli");
+         
+
+       //Update de los titulos de los niveles      
+       function clicked(d) {
+          d3.selectAll(".litrect").attr("pointer-events", "auto").classed("litrect", false);
+          var ent = {}, margin = 40;
+          var ac = d;
+          d3.selectAll(".sp1").text("");
+          while(ac.parent){
+            d3.select(".deep" + ac.depth)
+              .style("opacity", 100)
+              .style("background", color(ac.data.key))
+              .text(ac.data.key+ ": " + ac.value)
+            ent[niveles[ac.depth-1]] = ac.data.key;  
+            ac = ac.parent;
+          }
+          if(!ac.parent){
+            var ck = d3.select(".ultimo")
+              .style("opacity", 100)
+              .style("background", color(ac.data.key))
+              .text("Total Pacientes: " + ac.value)
+              divpac.transition(tra).style("left", "1500px").style("opacity", 0);
+              divlegend.transition(tra).style("left", (width+wc) + "px").style("opacity", 1);
+            }
+            
+
+          ac = d;    
+            x.domain([d.y0, wi]).range([d.depth ? margin : 0, wi]);
+            y.domain([d.x0, d.x1]).range([0, hi])
+            rect.transition()
+            .duration(750)
+            .attr("x", function(d) { return x(d.y0); })
+            .attr("y", function(d) { return y(d.x0)})
+            .attr("width", function(d) { w = x(d.y1) - x(d.y0);  return x(d.y1) - x(d.y0); })
+            .attr("height", function(d) { return y(d.x1) - y(d.x0); });
+            var pos = {0: [[w,2*w], [2*w,3*w], [3*w,4*w]],
+                       1: [[margin,(w+margin)], [(w+margin),(2*w + margin)], [(2*w + margin),(3*w + margin)]],
+                       2: [[1000,1001], [margin,(w+20)], [(w+margin),(2*w + margin)]],
+                       3: [[1000,1101], [1000,1101], [margin,(w+margin)]]} 
+            tit = gt.selectAll("text")
+            .data(niveles)
+            tit.transition(tra)
+            .attr("y", mtop-10)
+            .attr("x", function(d, i) { 
+              k = (w/2) + pos[ac.depth][i][0] - (d.length + 2)*3;
+              return k; 
+            })
+            .text(function(d){ return "- " + d + "-" })
+
+          //update2(ent);
+        } 
+
+         function over(d) {
+          console.log("si")
+            d3.selectAll(".sp").style("opacity", 0)
+            var ac = d;
+            d3.selectAll(".sp1").text("");
+            while(ac.parent){
+              d3.select(".deep" + ac.depth)
+                .style("opacity", 100)
+                .style("background", color(ac.data.key))
+                .style("width", "300px")
+                .text(ac.data.key+ ": " + ac.value) 
+              ac = ac.parent;
+            }
+            if(!ac.parent)
+              d3.select(".ultimo")
+                .style("opacity", 100)
+                .style("background", color(ac.data.key))
+                .text("Total Pacientes: " + ac.value)
+          
+              
+        }  
+
+        function dragstarted(d) {
+          init = [d3.select(this).attr("x"), d3.select(this).attr("y")];
+          d3.select(this).raise().classed("active", true);
+
+        }
+
+        function dragged(d) {
+          d3.select(this).attr("x", d3.event.x).attr("y", d3.event.y);
+        }
+
+        function dragended(d) {
+          var pa = niveles.indexOf(d);
+          var finit = d3.event.x;
+          d3.select(this).classed("active", false);
+          d3.select(this).attr("x", init[0]).attr("y", init[1]);
+          for(var p in pos){
+            if(pos[p][0]<= finit && pos[p][1] > finit && pa != p){
+              niveles[pa] = niveles[p]
+              niveles[p] = d;
+              updateAll(niveles);
+            }
+
+          }
+          
+        }
+
+      //Cierra lo del icicle
+
+
+      x.domain(d3.extent(datos, function(d) { return d.costo; })).nice();
+      y.domain([0,50]).nice();
+
+      // Set initial positions
+      datos.forEach(function(d) {
+        d.x = x(d.costo);
+        d.y = y(d.reintervenciones);
+        d.color = colore(d.especialidad);
+        d.radius = radius;
+      });
+
+      svg.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x))
+        .append("text")
+          .attr("class", "label")
+          .attr("x", width)
+          .attr("y", -6)
+          .style("text-anchor", "end")
+          .text("Costo de las reintervenciones");
+
+      svg.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+        .append("text")
+          .attr("class", "label")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+          .text("Número de reintervenciones")
+
+
+      var node = svg.selectAll(".dot")
+          .data(datos)
+
+        node.attr("r", radius)
+          .attr("cx", function(d) { return d.x; })
+          .attr("cy", function(d) { return d.y; })
+          .style("fill", function(d) { return d.color; })
+        node.enter().append("circle")
+          .attr("class", function(d){ return "dot " + pc[d.especialidad]})
+           .on('mouseover',tip.show)
+       .on('mouseout', tip.hide)
+          .attr("r", radius)
+          .attr("cx", function(d) { return d.x; })
+          .attr("cy", function(d) { return d.y; })
+          .style("fill", function(d) { return d.color; })
+        
+
+
+          
+     var legend = svg.selectAll(".legend")
+          .data(colore.domain())
+        .enter().append("g")
+          .attr("class", "legend")
+          .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });             
+
+      legend.append("rect")
+          .attr("x", width + lengedSpace - 18)
+          .attr("width", 18)
+          .attr("height", 18)
+          .style("fill", colore)
+          .attr("class", function(d){ return "L" + pc[d] })
+          .on('mouseover', function(d){
+            d3.select(this).attr("width", "20").attr("height", "20");
+            d3.selectAll(".dot").attr("opacity", 0.2);
+            d3.selectAll("." + pc[d]).attr("opacity", 1);
+          })
+          .on('mouseout', function(d){
+            d3.select(this).attr("width", "18").attr("height", "18");
+            d3.selectAll(".dot").attr("opacity", 1);
+           })
+
+      legend.append("text")
+          .attr("x", width + lengedSpace - 24)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .style("text-anchor", "end")
+          .text(function(d) { return d; });
+
+        var forceCollide = d3.forceCollide(function(d) { return d.radius; })
+        .strength(0.8);
+    
+        var s = 0.02;
+        
+       
+        var force = d3.forceSimulation(data)
+          .force("x", d3.forceX(function(d) { return d.x; }))
+          .force("y", d3.forceY(function(d) { return d.y; }))
+          .on('tick', function() {
+            svg.selectAll('.dot')
+              .attr('cx', function(d) { return d.x; })
+              .attr('cy', function(d) { return d.y; })
+          })
+          
+         
+
+         d3.select("#collisiondetection").on("change", function() {
+            if(d3.select(this).property("checked")){
+              force.nodes(datos)
+              .force('collide', forceCollide)
+            }else{
+              force.nodes(datos)
+              .force('collide', function(){})
+              updateAll(niveles)
+            }
+            
+          });
+                
+
+      
+  }//Cierra Update
+  updateAll(["genero", "edad", "fuerza"])
+});
+
+
+</script>
+
+
+  </body>
+
+</html>
