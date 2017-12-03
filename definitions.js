@@ -27,7 +27,8 @@ for(var ye in ytot)
   pyears.append("p").html('<input type="checkbox" class="year" value="' + ytot[ye] +'" checked="checked">' + ytot[ye])
 
 //This will locate the total cards
-d3.select(".desc").style("left", (margin.left+50) + "px");
+console.log(d3.select(".container").style("left"));
+d3.select(".desc").style("left", "auto").style("top", "5px");
 
 
 //Scatter Plot elements

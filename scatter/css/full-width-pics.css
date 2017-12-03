@@ -122,20 +122,22 @@ input {
 .legend{
   font-size: 12px;
 }
-.creint .card-header, .cpac .card-header{
+.desc .card-header{
   background: #3182bd;
   display: table-column;
-}
-.desc{
-  position: relative;
-  height: 2px;
-}
-.desc .card{
-  position: relative;
-}
-.desc .card-header, .desc .card-body{
   height: 30px;
 }
+.desc .card-body{
+  height: 20px;
+  padding-top:2px;
+}
+.desc{
+  position: absolute;
+  display: flex;
+  transform: translate(100px, 450px);
+  height: 60px;
+}
+
 .pullyears p{
   display: inline;
 }

@@ -5,7 +5,7 @@ d3.json("../fileDi2.json", function(error, data) {
   function cargar(){
     pc = {}; datos = []; //Array services and data for scatter and icicle
     var ft = {}, k = 0;
-    arrproc = {}; tpac = {};
+    tpac = {};
     years = []; 
       d3.selectAll(".year").each(function(){
         if(this.checked) years.push(this.value)
@@ -24,14 +24,14 @@ d3.json("../fileDi2.json", function(error, data) {
               val+=p["cirugias"][c].hijas[v].valorfactura;
             for(var j in p["cirugias"][c]["procedimientos"]){
               var k = p["cirugias"][c]["procedimientos"][j];
-              if (ini.indexOf(k.nomProc) == -1) ini.push(k.nomProc)
+              if (ini.indexOf(k.nomProc + "-" + k.especialidad) == -1) ini.push(k.nomProc + "-" + k.especialidad)
               if(!ft[k["especialidad"]]) ft[k["especialidad"]] = {};
               if(!ft[k["especialidad"]][k["nomProc"]]) ft[k["especialidad"]][k["nomProc"]] = {"reint": 0, "valor": 0};
-              if(!arrproc[k["nomProc"]]) arrproc[k["nomProc"]] = k["especialidad"];
             }
             for(var z in ini){
-              ft[arrproc[ini[z]]][ini[z]]["reint"] += hj;
-              ft[arrproc[ini[z]]][ini[z]]["valor"] += val;
+              var sp = ini[z].split("-")
+              ft[sp[1]][sp[0]]["reint"] += hj;
+              ft[sp[1]][sp[0]]["valor"] += val;
             }
         }
       }
@@ -40,7 +40,7 @@ d3.json("../fileDi2.json", function(error, data) {
     });
     var cons = 0;
     for (var i in ft){
-      pc[i] = {"id": "A" + cons,"value":0}; cons++;
+      pc[i] = {"id": "A" + cons,"value":0, "procs": 0}; cons++;
       for(var j in ft[i]){
         if(ft[i][j].reint>0){
           datos.push({"nomProc": j, "especialidad": i, "reintervenciones": ft[i][j].reint, "costo":  ft[i][j].valor})
@@ -50,6 +50,7 @@ d3.json("../fileDi2.json", function(error, data) {
     }
     x.domain(d3.extent(datos, function(d) { return d.costo; })).nice();
     y.domain([0,50]).nice();
+    d3.select(".cpro .card-text").text("Total: " + datos.length)
     nvt = 0; //Count total reinterventions
     datos.forEach(function(d) {
       d.x = x(d.costo);
@@ -331,7 +332,7 @@ d3.json("../fileDi2.json", function(error, data) {
       //Cierra lo del icicle
       
          function update2(ent){
-            var ft = {"pac": {}}, k = 0, arrproc = {};
+            var ft = {"pac": {}}, k = 0;
             var wt = 40, cons = 0;
             for(var z in tpac){
               var p = tpac[z];
@@ -344,13 +345,15 @@ d3.json("../fileDi2.json", function(error, data) {
                     var hj = p["cirugias"][c].hijas.length;
                     for(var j in p["cirugias"][c]["procedimientos"]){
                       var k = p["cirugias"][c]["procedimientos"][j];
-                      if (ini.indexOf(k.nomProc) == -1) ini.push(k.nomProc)
+                      if (ini.indexOf(k.nomProc + "-" + k.especialidad) == -1) ini.push(k.nomProc + "-" + k.especialidad)
                       if(!ft["pac"][k["especialidad"]]) ft["pac"][k["especialidad"]] = {};
                       if(!ft["pac"][k["especialidad"]][k["nomProc"]]) ft["pac"][k["especialidad"]][k["nomProc"]] = 0;
-                      if(!arrproc[k["nomProc"]]) arrproc[k["nomProc"]] = k["especialidad"];
+                      //if(!arrproc[k["nomProc"]]) arrproc[k["nomProc"]] = k["especialidad"];
                     }
-                    for(var z in ini)
-                      ft["pac"][arrproc[ini[z]]][ini[z]] += hj;
+                    for(var z in ini){
+                      var sp = ini[z].split("-")
+                      ft["pac"][sp[1]][sp[0]] += hj;
+                    }
                   }
                 }
               }
@@ -389,6 +392,7 @@ d3.json("../fileDi2.json", function(error, data) {
                     if(d.depth == 0) vt = d.value;  
                     if(d.depth == 1){
                      pc[d.data.key]["value"] = d.value;
+                     pc[d.data.key]["procs"] = d.children.length;
                      return colore(d.data.key)
                     }else return color(d.data.key); })
                 .attr("class", function(d){ if (d.depth > 0) return "little" }) 
@@ -424,7 +428,7 @@ d3.json("../fileDi2.json", function(error, data) {
                     .style("background", colore(d.data.key))
                     .text(d.data.key)
                   d3.select(".cproc .card-text")
-                    .text("Reintervenciones: " + d.value) 
+                    .html("Reintervenciones: " + d.value + "<br>Procedimientos: " + pc[d.data.key].procs) 
                   }else{
                     if(!(d3.selectAll(".little").attr("pointer-events") == "none") )
                     d3.select(".cproc .card-header")
