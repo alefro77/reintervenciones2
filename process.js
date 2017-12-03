@@ -374,7 +374,7 @@ d3.json("../fileDi2.json", function(error, data) {
                 .style("fill", function(d) {  return color(d.data.key); }); 
             var n1 = node.enter().append("g")
                 .attr("transform", function(d) { return "translate(" + d.x/1.2 + "," + d.y/1.2 + ")"; })
-                .attr("class", function(d) { if(d.depth == 1) return("serv L" + pc[d.data.key]["id"]); else return "serv"})
+                .attr("class", function(d) { if(d.depth == 1) return("cir serv L" + pc[d.data.key]["id"]); else return "cir serv"})
                 .each(function(d) { d.node = this; })
                 .on("mouseover", hovered)
                 .on("mouseout",  nohovered)
@@ -448,4 +448,15 @@ d3.json("../fileDi2.json", function(error, data) {
     cargar();
     updateAll(["genero", "edad", "fuerza"])
   })
+  d3.select(".btn").on("click", function(){
+    var mensaje = {"a1": "Seleccionar todos", "a2": "Deseleccionar todos"}
+    if(this.id == "a1"){
+        d3.selectAll(".year").property("checked", false)
+        d3.select(this).text(mensaje["a1"]).attr("id", "a2")
+    }else{
+        d3.selectAll(".year").property("checked", true)
+        d3.select(this).text(mensaje["a2"]).attr("id", "a1")
+    }
+    cargar();
+  }) 
 });

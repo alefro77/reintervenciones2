@@ -17,7 +17,6 @@ var colorg = {"MASCULINO": "#316395", "FEMENINO": "#ff9896", "EJERCITO 2017": "#
               "pac": "#4682B4"} //Color just for gender 
 //Defintion of color scale according data, 
 function color(dk){
-    console.log(dk)
   if(colorg[dk]) return colorg[dk];
   else return ck(dk)
 }
@@ -139,7 +138,7 @@ var partition = d3.partition() //How the icicle will be scaled
     .padding(0)
     .round(true);
 
-   
+
 
 //End Icicle    
 
