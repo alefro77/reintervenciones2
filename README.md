@@ -1,4 +1,5 @@
-# reint
+# Reintervenciones
+
 El proyecto parte del dataset (data.csv). Procedimientos realizados en el hospital militar desde el año 2012. El dataset inicialmente se procesa con el archivo npass.py con las siguientes condiciones
   -Una intervención son los procedimientos que se realizan exactamente en la misma fecha y hora
   -Una reinervención corresponde a una nueva intervención en un periodo máximo de 60 días al mismo paciente.
