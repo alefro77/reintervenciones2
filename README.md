@@ -14,9 +14,14 @@ El proyecto parte del dataset (data.csv). Procedimientos realizados en el hospit
  
 Este proyecto de visualización buscar realizar especialmente las siguientes tareas
 
-  -Presentar por cada servicio la cantidad de reintervenciones generadas en periodos de tiempo o acumulados y sus costos asociados
+  -Identificar los procedimientos que mas intervenciones generan y sus costos asociados
+  
+  -Comparar de acuerdo a los datos demográficos de los pacientes, la cantidad de reintervenciones por cada una de las características definidas.
+  
+  -Encontrar por especialidad los procedimientos y la cantidad de reintervenciones generadas a partir de la caacterizació
+  n de los filtros defindos en la caracterización del paciente
+  
 
-  -Comparar el riesgo, dadas las características de un paciente, de tener reintervenciones quirúrgicas a partir del tipo de procedimiento realizado
 
 La visualización consta de 3 Idioms, un scatterplot con la posición vertical para el costo de las reintervenciones y posición horizontal para la cantidad de reintervenciones. Todas pueden ser filtradas de acuerdo al año de interés.
 
