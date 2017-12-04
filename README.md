@@ -16,9 +16,9 @@ Este proyecto de visualización buscar realizar especialmente las siguientes tar
 
   -Identificar los procedimientos que mas reintervenciones generan y sus costos asociados
   
-  -Comparar de acuerdo a los datos demográficos de los pacientes, la cantidad de reintervenciones por cada una de las características definidas.
+  -Comparar de acuerdo a los datos demográficos de los pacientes, la cantidad de reintervenciones por cada una de las características definidas (edad, genero y fuerza).
   
-  -Encontrar por especialidad los procedimientos y la cantidad de reintervenciones generadas a partir de la caacterización de los filtros defindos en la caracterización del paciente
+  -Encontrar por especialidad los procedimientos y la cantidad de reintervenciones generadas a partir de los filtros defindos en la caracterización del paciente
   
 
 
