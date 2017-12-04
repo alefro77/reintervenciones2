@@ -14,7 +14,7 @@ Este proyecto de visualización buscar realizar especialmente las siguientes tar
 
 La visualización consta de 3 Idioms, un scatterplot con la posición vertical para el costo de las reintervenciones y posición horizontal para la cantidad de reintervenciones. Todas pueden ser filtradas de acuerdo al año de interés.
 
-![alt text](http://url/to/img.png)
+![alt text](https://alefro77.github.io/reintervenciones2/first.png)
 
 Posteriormente se presenta un Icicle Treemap ordenable por las características de edad (rango de edad), género y fuerza. Con la selección de cualquiera de las areas dentro del Treemap, se filtran los procedimientos en un bubble chart cuya area identifica el número de reintervenciones. Al paso del mouse por los circulos del chart se muestra en detalle la cantidad y la especialidad a la que pertencen.
 
