@@ -1,4 +1,4 @@
-# Reintervenciones Hospital Militar
+# Reintervenciones
 
 El proyecto parte del dataset (data.csv). Procedimientos realizados en el hospital militar desde el año 2012. El dataset inicialmente se procesa con el archivo npass.py con las siguientes condiciones
 
