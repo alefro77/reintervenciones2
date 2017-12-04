@@ -18,8 +18,7 @@ Este proyecto de visualización buscar realizar especialmente las siguientes tar
   
   -Comparar de acuerdo a los datos demográficos de los pacientes, la cantidad de reintervenciones por cada una de las características definidas.
   
-  -Encontrar por especialidad los procedimientos y la cantidad de reintervenciones generadas a partir de la caacterizació
-  n de los filtros defindos en la caracterización del paciente
+  -Encontrar por especialidad los procedimientos y la cantidad de reintervenciones generadas a partir de la caacterización de los filtros defindos en la caracterización del paciente
   
 
 
