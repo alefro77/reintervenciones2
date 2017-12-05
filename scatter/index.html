@@ -2,6 +2,40 @@
 <html lang="en">
 
   <head>
+    <style>
+.card-header{
+  font-size: 14px;
+  color:white;
+}
+.card-title{
+  font-size: 14px;
+  color:black;
+}
+.card-text{
+  color:black;
+}
+.legend{
+  font-size: 12px;
+}
+.creint .card-header, .cpac .card-header{
+  background: #3182bd;
+  display: table-column;
+}
+.desc{
+  position: relative;
+  height: 2px;
+}
+.desc .card{
+  position: relative;
+}
+.desc .card-header, .desc .card-body{
+  height: 30px;
+}
+
+
+  </style>
+ 
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
@@ -27,35 +61,30 @@
         <p class="lead">¿Cuál es el procedimiento que genera más reintervenciones y mayores costos?</p>
         <p>A partir del reporte de procedimientos del Hospital Militar Central se calcularon las reintervenciones que genera cada uno de los procedimientos. En la siguiente gráfica se muestra el resultado en el que se evidencia que el procedimiento de "Ventriculostomia drenaje externo" es el que ha generado el mayor número de reintervenciones mayores costos causados por estas.</p>
         <p>
-          <button id="a1" type="button" class="btn btn-primary">Deseleccionar todos</button>
+          <input type="checkbox" class="year" name="2012" value="2012" checked="checked">2012
+          <input type="checkbox" class="year" name="2013" value="2013" checked="checked">2013
+          <input type="checkbox" class="year" name="2014" value="2014" checked="checked">2014
+         <input type="checkbox" class="year" name="2015" value="2015" checked="checked">2015
+          <input type="checkbox" class="year" name="2016" value="2016" checked="checked">2016
+          <input type="checkbox" class="year" name="2017" value="2017" checked="checked">2017
         </p>
-        <p class="pullyears"></p>
         <p>
           <input type="checkbox" id="collisiondetection" name="det">Aislar Procedimientos
-        </p>
-        <div class="desc">
-          <div class="card creint">
-            <h3 class="card-header primary-color white-text">Reintervenciones</h3>
-            <div class="card-body">
-              <p class="card-text"></p>
-            </div>
-          </div>
-          <div class="card cpac">
-            <h3 class="card-header primary-color white-text">Pacientes</h3>
-            <div class="card-body">
-              <p class="card-text"></p>
-            </div>
-          </div>
-          <div class="card cpro">
-            <h3 class="card-header primary-color white-text">Procedimientos</h3>
-            <div class="card-body">
-              <p class="card-text"></p>
-            </div>
-          </div>
-        </div>
+       </p>
+       <div class="desc" style="width: 180px;"><div class="card creint"><h3 class="card-header primary-color white-text">Reintervenciones</h3><div class="card-body"><p class="card-text"></p></div></div><div class="card cpac"><h3 class="card-header primary-color white-text">Pacientes</h3><div class="card-body"><p class="card-text"></p></div></div></div>
          
+    </div>
       </div>
-   </section>
+      
+    </section>
+
+    <!-- Image Section - set the background image for the header in the line below -->
+    <section class="py-5 bg-image-full">
+      <!-- Put anything you want here! There is just a spacer below for demo purposes! -->
+      
+    </section>
+
+
 
     <!-- Footer -->
     <footer class="py-5 bg-dark">
@@ -65,14 +94,630 @@
       <!-- /.container -->
     </footer>
 
-    <!-- Bootstrap core JavaScript D3-->
+    <!-- Bootstrap core JavaScript -->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    
     <script src="../d3.v4.min.js"></script>
-    <script src="../d3-tip.js"></script>
-    <script src="../definitions.js"></script>
-    <script src="../process.js"></script>
+<script src="../d3-tip.js"></script>
+<script>
+var margin = {top: 20, right: 200, bottom: 60, left: 60},
+    width = 1000,
+    height = 550,
+    padding = 1, // separation between nodes
+    ls = 200,
+    radius = 6;
+var format = d3.format("$,");
+//Scatter Plot elements    
+var x = d3.scaleLinear()
+    .range([0, (width-margin.left-margin.right)]);
+var y = d3.scaleLinear()
+    .range([(height-margin.top-margin.bottom), 0]);
+var colore = d3.scaleOrdinal(d3.schemeCategory10)
+ck = d3.scaleOrdinal(d3.schemeCategory20c)
+var colorg = {"MASCULINO": "#316395", "FEMENINO": "#ff9896"}
+function color(dk){
+  if(colorg[dk]) return colorg[dk];
+  else return ck(dk)
+}
+//var color = d3.scaleOrdinal(d3.schemeCategory20)
+var yAxis = d3.axisLeft(y)
+    .ticks(5);
+    
+var xAxis = d3.axisBottom(x)
+    .tickFormat(format)
+    .ticks(5);
+//SVG para scatter
+var svg = d3.select(".container").append("svg")
+    .attr("class", "svgscatter")
+    .attr("width", width)
+    .attr("height", height)
+var gsc = svg.append("g").attr("class", "gsc").attr("width", (width - margin.left - margin.right))
+    .attr("height", (height - margin.bottom - margin.top))
+    .attr("transform", "translate("+ margin.left +"," + margin.top + ")")
+var gsl = svg.append("g").attr("class", "gsl").attr("width", ls)
+    .attr("height", 400)
+    .attr("transform", "translate(" + (width-300) +",200)")  
+       
+//Controles Scatter
+var tip = d3.tip()
+    .attr('class', 'd3-tip')
+    .offset([-10, 150])
+    .html(function(d) {
+    return "<strong>Procedimiento:</strong> <span>" + d.nomProc + "</span><br> <strong>Reintervenciones:</strong> <span>" + d.reintervenciones + "</span><br> <strong>Costo:</strong> <span>" + format(d.costo) + "</span>";
+  })
+  svg.call(tip);
 
+d3.select(".desc").style("left", (margin.left+50) + "px");
+//d3.select(".cpac").style("left", (180) + "px").style("top", (-60) + "px");
+// End Defintions Scatter plot
+//Svg para icicle
+var mtop = 20, wi = 300, hi = 400;
+var tra = d3.transition()
+      .duration(2000);
+var colorg = {"MASCULINO": "#316395", "FEMENINO": "#ff9896"} 
+    
+var svgtit = d3.select(".container").append("div")
+    .attr("class", "svgtit")
+    .attr("width", width)
+    .attr("height", mtop)
+    .style("left", (margin.left + wi) + "px")
+    .style("top", (2*margin.top) + "px");
+var svgi = d3.select(".container").append("svg")
+    .attr("class", "svgi")
+    .attr("width", (wi + margin.left))
+    .attr("height", (hi)).attr("transform", "translate(0,0)");
+   
+var gi = svgi.append("g")
+    .attr("width", wi).attr("height", hi).attr("transform", "translate(" + margin.left + "," + margin.top + ")"); 
+var gt = svgi.append("g").attr("class", "gt")
+    .attr("width", (wi)).attr("height", mtop).attr("transform", "translate(" + margin.left + ",0)")
+gt.append("rect").attr("width", "100%")
+    .attr("height", mtop)
+    .attr("fill", "white");      
+var gtot = svgi.append("g").attr("class", "gtot")
+    .attr("width", (wi/4)).attr("height", hi).attr("transform", "translate(" + margin.left + ",0)");
+var tap = svgi.append("g")
+    .attr("width", margin.left).attr("height", hi).
+    append("rect").attr("width", margin.left)
+    .attr("height", hi)
+    .attr("fill", "white");    
+          
+var partition = d3.partition()
+    .size([hi, wi])
+    .padding(0)
+    .round(true);
+var wc = 400, wl = 300;
+var hc = 400, hl = 600;
+svgtit.append("span").attr("class", "sp ultimo")
+svgtit.append("span").attr("class", "deep1 sp sp1")
+svgtit.append("span").attr("class", "deep2 sp sp1")
+svgtit.append("span").attr("class", "deep3 sp sp1")   
+//End Icicle
+//Para el bubble
+var svgbubble = d3.select(".container").append("svg").attr("class", "bubble")
+    .attr("width", wc + wl)
+    .attr("height", hc)
+    .attr("transform", "translate(20, " + mtop*3 +")")
+    .attr("class", "svgbuble")
+var divproc = d3.select(".container").append("div")
+    .html('<div class="card cproc"><h3 class="card-header primary-color white-text"></h3><div class="card-body"><h4 class="card-title"></h4><p class="card-text"></p></div></div>')
+    .style("width", wl + "px")
+    .style("height", 200 + "px")
+    .attr("class", "divproc").style("left", (wc+wl) + "px").style("top", (12*mtop - hi) +"px")
+/*
+var divpac = d3.select("body").append("div")
+    .attr("id", "divpac")
+    .style("width", "300px")
+    .style("height", "600px")
+    .attr("class", "divpac").style("left", "1500px").style("top", mtop + "px") 
+    .style("overflow-y", "scroll")  */
+var pack = d3.pack()
+    .size([wc, hc])
+    .padding(10);           
+d3.json("../fileDi2.json", function(error, data) {
+    if (error) throw error;
+    
+    function cargar(){
+      pc = {}; datos = [];
+      var ft = {}, k = 0, arrproc = {}; tpac = {};
+      years = [];
+        d3.selectAll(".year").each(function(){
+          if(this.checked) years.push(this.value)
+        })
+
+      data.forEach(function(p){
+          var eval = 0;
+          for(var c in p["cirugias"]){
+            var fc = p["cirugias"][c].fecha.substring(6,10)
+            if(years.indexOf(fc) > -1){
+                eval = 1;
+                var ini = [];
+                var hj = p["cirugias"][c].hijas.length;
+                var val = 0
+                for(var v in p["cirugias"][c].hijas) 
+                  val+=p["cirugias"][c].hijas[v].valorfactura;
+                for(var j in p["cirugias"][c]["procedimientos"]){
+                  var k = p["cirugias"][c]["procedimientos"][j];
+                  if (ini.indexOf(k.nomProc) == -1) ini.push(k.nomProc)
+                  if(!ft[k["especialidad"]]) ft[k["especialidad"]] = {};
+                  if(!ft[k["especialidad"]][k["nomProc"]]) ft[k["especialidad"]][k["nomProc"]] = {"reint": 0, "valor": 0};
+                  if(!arrproc[k["nomProc"]]) arrproc[k["nomProc"]] = k["especialidad"];
+                }
+                for(var z in ini){
+                  ft[arrproc[ini[z]]][ini[z]]["reint"] += hj;
+                  ft[arrproc[ini[z]]][ini[z]]["valor"] += val;
+                }
+            }
+          }
+          if(eval == 1) tpac[p.id]= p;
+
+        });
+          cons = 0;
+          for (var i in ft){
+            pc[i] = {"id": "A" + cons,"value":0}; cons++;
+            for(var j in ft[i]){
+              if(ft[i][j].reint>0){
+                datos.push({"nomProc": j, "especialidad": i, "reintervenciones": ft[i][j].reint, "costo":  ft[i][j].valor})
+              }
+              
+            }
+          }
+          updateAll(["genero", "edad", "fuerza"])
+      }
+      cargar()
+      
+
+  function updateAll(niveles){
+    
+  //Para el Icicle
+      var arr = {}
+      for(var c in tpac){
+        var k = tpac[c];
+        if(!arr[k[niveles[0]]]) arr[k[niveles[0]]] = {}
+        if(!arr[k[niveles[0]]][k[niveles[1]]]) arr[k[niveles[0]]][k[niveles[1]]] = {}
+        if(!arr[k[niveles[0]]][k[niveles[1]]][k[niveles[2]]]) arr[k[niveles[0]]][k[niveles[1]]][k[niveles[2]]] = 0
+        arr[k[niveles[0]]][k[niveles[1]]][k[niveles[2]]]++ 
+      }
+      arr2 = {};
+      arr2["pacientes"] = (niveles[0])? arr: d.length;
+      var root = arr2;
+      root = d3.hierarchy(d3.entries(root)[0], function(d) {
+          return d3.entries(d.value)
+      })
+        .sum(function(d) { 
+            return d.value;
+        })
+      .sort(function(a, b) { return b.value - a.value; });
+      partition(root);
+      var init = [], finit = [];
+      var w = 0;    
+      var tit = gt.selectAll("text")
+      .data(niveles)
+      var rect = gi.selectAll("rect").data(root.descendants());
+      rect.attr("x", function(d) { return d.y0; })
+          .attr("y", function(d) { return d.x0})
+          .attr("width", function(d) { w = d.y1 - d.y0; return w; })
+          .attr("height", function(d) { return d.x1 - d.x0; })
+          .attr("fill", function(d) {  return color(d.data.key); })
+          .attr("lev", function(d){  return d.depth})
+      rect = rect.enter().append("rect")
+          .attr("x", function(d) { return d.y0; })
+          .attr("y", function(d) { return d.x0})
+          .attr("width", function(d) { w = d.y1 - d.y0; return w; })
+          .attr("height", function(d) { return d.x1 - d.x0; })
+          .attr("fill", function(d) { return color(d.data.key); })
+          .attr("lev", function(d){  return d.depth})
+          .on("dblclick", function(d){
+            d3.selectAll("rect").each(function(k){
+              if(d3.select(this).attr("lev") > d.depth)
+                d3.select(this).classed("litrect", true)
+            })
+            d3.selectAll(".litrect").attr("pointer-events", "none")
+          })
+          .on("click", clicked)
+          .on("mouseover", over)
+          .on("mouseout", function(){
+            if(d3.event.x > width || d3.event.y < mtop || d3.event.y > (mtop + height)){
+              d3.selectAll(".litrect").attr("pointer-events", "auto")
+            }
+          })
+          d3.select(".ultimo").style("opacity", 100).style("background", color(root.descendants()[0].data.key)).text("Total Pacientes: " + root.descendants()[0].value)
+          d3.select(".cpac .card-text").text("Total Pacientes: " + root.descendants()[0].value)
+       var pos = [[w,2*w], [2*w,3*w], [3*w,4*w]];      
+      gtot.append("text").text("TOTAL PACIENTES").attr("x", -(mtop + (hi/2) + 50)).attr("y", 25).attr("transform", "rotate(-90)").attr("class", "total").style("fill", "white").style("font-size", "14px"); 
+      //Enter de los titulos de los niveles
+      tit.transition(tra)
+          .attr("y", (mtop-10))
+          .attr("x", function(d, i) { k = (w/2) + pos[i][0] - (d.length + 2)*3; return k; })
+          .text(function(d){ return "- " + d + "-" })
+      tit = tit.enter().append("text")
+            .attr("y", (mtop-10))
+            .attr("x", function(d, i) { k = (w/2) + pos[i][0] - (d.length + 2)*3; return k; })
+            .text(function(d){ return "- " + d + "-" })
+            .call(d3.drag()
+              .on("start", dragstarted)
+              .on("drag", dragged)
+              .on("end", dragended))
+            .attr("class", "dli");
+         
+       //Update de los titulos de los niveles      
+       function clicked(d) {
+          d3.selectAll(".litrect").attr("pointer-events", "auto").classed("litrect", false);
+          var ent = {}, margin = 40;
+          var ac = d;
+          d3.selectAll(".sp1").text("");
+          while(ac.parent){
+            d3.select(".deep" + ac.depth)
+              .style("opacity", 100)
+              .style("background", color(ac.data.key))
+              .text(ac.data.key+ ": " + ac.value)
+            ent[niveles[ac.depth-1]] = ac.data.key;  
+            ac = ac.parent;
+          }
+          if(!ac.parent){
+            var ck = d3.select(".ultimo")
+              .style("opacity", 100)
+              .style("background", color(ac.data.key))
+              .text("Total Pacientes: " + ac.value)
+              //divpac.transition(tra).style("left", "1500px").style("opacity", 0);
+              //divlegend.transition(tra).style("left", (width+wc) + "px").style("opacity", 1);
+            }
+            
+          ac = d;    
+            x.domain([d.y0, wi]).range([d.depth ? margin : 0, wi]);
+            y.domain([d.x0, d.x1]).range([0, hi-mtop])
+            rect.transition()
+            .duration(750)
+            .attr("x", function(d) { return x(d.y0); })
+            .attr("y", function(d) { return y(d.x0)})
+            .attr("width", function(d) { w = x(d.y1) - x(d.y0);  return x(d.y1) - x(d.y0); })
+            .attr("height", function(d) { return y(d.x1) - y(d.x0); });
+            var pos = {0: [[w,2*w], [2*w,3*w], [3*w,4*w]],
+                       1: [[margin,(w+margin)], [(w+margin),(2*w + margin)], [(2*w + margin),(3*w + margin)]],
+                       2: [[1000,1001], [margin,(w+20)], [(w+margin),(2*w + margin)]],
+                       3: [[1000,1101], [1000,1101], [margin,(w+margin)]]} 
+            tit = gt.selectAll("text")
+            .data(niveles)
+            tit.transition(tra)
+            .attr("y", mtop-10)
+            .attr("x", function(d, i) { 
+              k = (w/2) + pos[ac.depth][i][0] - (d.length + 2)*3;
+              return k; 
+            })
+            .text(function(d){ return "- " + d + "-" })
+          update2(ent);
+        } 
+        function over(d) {
+            d3.selectAll(".sp").style("opacity", 0)
+            var ac = d;
+            d3.selectAll(".sp1").text("");
+            while(ac.parent){
+              d3.select(".deep" + ac.depth)
+                .style("opacity", 100)
+                .style("background", color(ac.data.key))
+                .style("width", "300px")
+                .text(ac.data.key+ ": " + ac.value) 
+              ac = ac.parent;
+            }
+            if(!ac.parent)
+              d3.select(".ultimo")
+                .style("opacity", 100)
+                .style("background", color(ac.data.key))
+                .text("Total Pacientes: " + ac.value)
+        }  
+        function dragstarted(d) {
+          init = [d3.select(this).attr("x"), d3.select(this).attr("y")];
+          d3.select(this).raise().classed("active", true);
+        }
+        function dragged(d) {
+          d3.select(this).attr("x", d3.event.x).attr("y", d3.event.y);
+        }
+        function dragended(d) {
+          var pa = niveles.indexOf(d);
+          var finit = d3.event.x;
+          d3.select(this).classed("active", false);
+          d3.select(this).attr("x", init[0]).attr("y", init[1]);
+          for(var p in pos){
+            if(pos[p][0]<= finit && pos[p][1] > finit && pa != p){
+              niveles[pa] = niveles[p]
+              niveles[p] = d;
+              updateAll(niveles);
+            }
+          }
+        }
+        update2();
+      //Cierra lo del icicle
+      x.domain(d3.extent(datos, function(d) { return d.costo; })).nice();
+      y.domain([0,50]).nice();
+      var nvt = 0;
+
+      // Set initial positionvar
+      datos.forEach(function(d) {
+        d.x = x(d.costo);
+        d.y = y(d.reintervenciones); nvt+=d.reintervenciones;
+        d.color = colore(d.especialidad);
+        d.radius = radius;
+      });
+      d3.select(".creint .card-text").text("Total: " + nvt)
+      
+      d3.selectAll(".axis").remove()
+      gsc.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(0," + (height-margin.bottom-margin.top) + ")")
+          .call(d3.axisBottom(x))
+      gsc.append("text")
+          .attr("class", "label")
+          .attr("x", (width-margin.right-margin.left))
+          .attr("y", (height-margin.bottom-margin.top - 6))
+          .style("text-anchor", "end")
+          .text("Costo de las reintervenciones");
+      gsc.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+      gsc.append("text")
+          .attr("class", "label")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+          .text("Número de reintervenciones")
+        var node = gsc.selectAll(".dot")
+          .data(datos)
+        node.attr("r", radius)
+          .attr("cx", function(d) { return d.x; })
+          .attr("cy", function(d) { return d.y; })
+          .style("fill", function(d) { return d.color; })
+        node.enter().append("circle")
+          .attr("class", function(d){ return "dot " + pc[d.especialidad].id})
+          .on('mouseover',tip.show)
+          .on('mouseout', tip.hide)
+          .attr("r", radius)
+          .attr("cx", function(d) { return d.x; })
+          .attr("cy", function(d) { return d.y; })
+          .style("fill", function(d) { return d.color; })
+        
+          
+      var legend = gsl.selectAll(".legend")
+          .data(colore.domain())
+          .enter().append("g")
+          .attr("class", "legend")
+          .attr("transform", function(d, i) { return "translate(100," + i * 20 + ")"; });             
+      legend.append("rect")
+          .attr("x", ls - 18)
+          .attr("width", 18)
+          .attr("height", 18)
+          .style("fill", colore)
+          .attr("class", function(d){ return "L" + pc[d].id })
+          .on('mouseover', function(d){
+            d3.select(this).attr("width", "20").attr("height", "20");
+            d3.selectAll(".dot").attr("opacity", 0.2);
+            d3.selectAll("." + pc[d].id).attr("opacity", 1);
+          })
+          .on('mouseout', function(d){
+            d3.select(this).attr("width", "18").attr("height", "18");
+            d3.selectAll(".dot").attr("opacity", 1);
+           })
+      legend.append("text")
+          .attr("x", ls - 24)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .style("text-anchor", "end")
+          .text(function(d) { return d; });
+        var forceCollide = d3.forceCollide(function(d) { return d.radius; })
+        .strength(0.8);
+    
+        var s = 0.02;
+        
+       
+        var force = d3.forceSimulation(data)
+          .force("x", d3.forceX(function(d) { return d.x; }))
+          .force("y", d3.forceY(function(d) { return d.y; }))
+          .on('tick', function() {
+            svg.selectAll('.dot')
+              .attr('cx', function(d) { return d.x; })
+              .attr('cy', function(d) { return d.y; })
+          })
+          
+         
+         d3.select("#collisiondetection").on("change", function() {
+            if(d3.select(this).property("checked")){
+              force.nodes(datos)
+              .force('collide', forceCollide)
+            }else{
+              force.nodes(datos)
+              .force('collide', function(){})
+              updateAll(niveles)
+            }
+         });
+         function update2(ent){
+            var ft = {"pac": {}}, k = 0, arrproc = {};
+            var wt = 40, cons = 0;
+            for(var z in tpac){
+              var p = tpac[z];
+              if(eval(p)){
+                //tpac[p.id]= p;
+                for(var c in p["cirugias"]){
+                  var fc = p["cirugias"][c].fecha.substring(6,10)
+                    if(years.indexOf(fc) > -1){
+                    var ini = [];
+                    var hj = p["cirugias"][c].hijas.length;
+                    for(var j in p["cirugias"][c]["procedimientos"]){
+                      var k = p["cirugias"][c]["procedimientos"][j];
+                      if (ini.indexOf(k.nomProc) == -1) ini.push(k.nomProc)
+                      if(!ft["pac"][k["especialidad"]]) ft["pac"][k["especialidad"]] = {};
+                      if(!ft["pac"][k["especialidad"]][k["nomProc"]]) ft["pac"][k["especialidad"]][k["nomProc"]] = 0;
+                      if(!arrproc[k["nomProc"]]) arrproc[k["nomProc"]] = k["especialidad"];
+                    }
+                    for(var z in ini)
+                      ft["pac"][arrproc[ini[z]]][ini[z]] += hj;
+                  }
+                }
+              }
+            };
+
+            var xx = d3.hierarchy(d3.entries(ft)[0], function(d) {
+                return d3.entries(d.value)
+            }).sum(function(d) { 
+                  return d.value;
+              }).sort(function(a, b) { return b.value - a.value; });
+            pack(xx);
+            var q = d3.selectAll(".cir");
+            q.remove();
+            var node = svgbubble.selectAll("g")
+              .data(xx.descendants())
+              
+            node.transition(tra)
+                .attr("id", function(d) { return "node-" + d.id; })
+                .attr("r", function(d) { 
+                  return d.r/1.5; })
+                .style("fill", function(d) {  return color(d.data.key); }); 
+            var n1 = node.enter().append("g")
+                .attr("transform", function(d) { return "translate(" + d.x/1.2 + "," + d.y/1.2 + ")"; })
+                .attr("class", function(d) { return "cir node" + (!d.children ? " node--leaf" : d.depth ? "" : " node--root"); })
+                .each(function(d) { d.node = this; })
+                .on("mouseover", hovered)
+                .on("mouseout",  nohovered)
+                .on("click", filProc)
+                .on("dblclick", function(){
+                  d3.selectAll(".little").attr("pointer-events", "none")
+                })
+            var vt = 0    
+            n1.append("circle")
+                .style("cursor", "pointer")
+                .attr("r", function(d) { return d.r/1.2; })
+                .style("fill", function(d) {
+                    if(d.depth == 0) vt = d.value;  
+                    if(d.depth == 1){
+                     pc[d.data.key]["value"] = d.value;
+                     return colore(d.data.key)
+                    }else return color(d.data.key); })
+                .attr("class", function(d){ if (d.depth > 0) return "little" }) 
+            d3.select(".cproc .card-header")
+                    .style("background", color("pac"))
+                    .text("Total Reintervenciones")
+            d3.select(".cproc .card-text")
+                      .text("Reintervenciones: " + vt) 
+            
+             
+          function eval(p){
+            var b = 0
+            for(var e in ent){
+              if (p[e] != ent[e]){
+                b = 1; break; 
+              }
+            }
+
+            return (b==0)? true: false;
+          }
+           function hovered(d) {
+                d3.select(".cproc .card-title").text("");
+                if(d.depth > 1){
+                  d3.select(".cproc .card-header")
+                    .style("background", colore(d.parent.data.key))
+                    .text(d.parent.data.key + ": " + pc[d.parent.data.key].value)
+                  d3.select(".cproc .card-title")
+                    .text(d.data.key)
+                  d3.select(".cproc .card-text")
+                    .text("Reintervenciones: " + d.data.value)  
+                }else if(d.depth == 1){
+                  d3.select(".cproc .card-header")
+                    .style("background", colore(d.data.key))
+                    .text(d.data.key)
+                  d3.select(".cproc .card-text")
+                    .text("Reintervenciones: " + d.value) 
+                  }else{
+                    if(!(d3.selectAll(".little").attr("pointer-events") == "none") )
+                    d3.select(".cproc .card-header")
+                    .style("background", color(d.data.key))
+                    .text("Total Reintervenciones")
+                    d3.select(".cproc .card-text")
+                      .text("Reintervenciones: " + d.value) 
+                  }
+            };
+           function nohovered(d) {   
+                d3.selectAll(".augment").classed("augment", false);
+                if(d.depth == 0)
+                  d3.selectAll(".little").attr("pointer-events", "auto")
+           };
+           function filProc(d){
+           /*   if(d.depth > 0){
+                
+                var sel = [];
+                for(var pta in tpac){
+                  var pt = tpac[pta];
+                  var ban = 0;
+                  for(var q in pt["cirugias"]){
+                    for(var h in pt["cirugias"][q]["procedimientos"]){
+                      tcir = pt["cirugias"][q]["procedimientos"][h];
+                      if((d.depth == 2 && d.data.key == tcir.nomProc)||(d.depth == 1 && tcir.especialidad == d.data.key)){
+                        ban++; 
+                        break;
+                      }
+                    }
+                  }
+                  if(ban > 0) sel.push(pt.id);
+                }
+                for(var sp in sel){
+                   var p = tpac[sel[sp]];
+                   var h3 = "<h3>Paciente: " + p.id + " Reintervenciones: " + p.reint + "</h3>";
+                   var txt = "<div class='descPaciente'><table>";
+                    var t = 1;
+                    for(j in p["cirugias"]){
+                      var cir = p["cirugias"][j];
+                      txt = txt + '<tr class="tdesc"><td rowspan="5">' + t + '</td><td>Fecha:</td><td>' +  cir.fecha + '</td></tr>';
+                      txt = txt +  '<tr><td>Valor:</td><td>' +  cir.valorfactura + '</td></tr>';
+                      txt = txt +  '<tr><td>Tipo Atencion:</td><td>' +  cir.tipoAtencion + '</td></tr>';
+                      txt = txt +  '<tr><td>Procedimientos:</td><td>';
+                      for(var h in cir.procedimientos){
+                         var pro = cir.procedimientos[h];
+                         txt = txt +  '<div>Especialidad: ' + pro.especialidad + ' -- Procedimiento ' + pro.nomProc + '</div>';
+                      }
+                      txt = txt + '</td></tr>';
+                      txt = txt +  '<tr><td>Proc Reint:</td><td>';
+                      for(var h in cir.hijas){
+                         var hij = cir.hijas[h];
+                         txt = txt + "<span>Fecha: " + hij.fecha +  "</span>"
+                         txt = txt + "<span>Valor: " + hij.valorfactura +  "</span>"
+                         for(var rtp in hij["procedimientos"]){
+                            prtp = hij["procedimientos"][rtp]
+                            txt = txt +  '<div> Especialidad: ' + prtp.especialidad + ' -- Procedimiento ' + prtp.nomProc + '</div>';
+                         }
+                            
+                      }
+                      txt = txt + '</td></tr>';
+                      t++;
+                    }
+                    txt = txt + "</table></div>";
+                    tpac[sel[sp]]["txt"] = txt;
+                    tpac[sel[sp]]["h3"] = h3;
+                }
+               
+                var qpac = divpac.html("").append("div").attr("id", "sortpac");
+                var pacs = d3.select("#sortpac").selectAll("div").data(d3.entries(sel)); 
+                var ht = ""; 
+                pacs.enter().each(function(d){
+                  ht = ht + tpac[d.value].h3 + tpac[d.value].txt;
+                })
+                $("#sortpac").html(ht);
+                $( "#sortpac").accordion({
+                  heightStyle: "content",
+                  collapsible: true,
+                });
+                divpac.transition(tra).style("left", (width+wc) + "px").style("opacity", 1);
+                divlegend.transition(tra).style("left", "1500px").style("opacity", 0);
+              }*/
+           }
+        }     
+      
+  }//Cierra Update
+  updateAll(["genero", "edad", "fuerza"])
+  d3.selectAll(".year").on("change", function(){
+    cargar();
+    updateAll(["genero", "edad", "fuerza"])
+  })
+});
+</script>
 
 
   </body>
