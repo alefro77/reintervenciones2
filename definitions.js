@@ -10,7 +10,7 @@ var tra = d3.transition()
       .duration(2000);    
 
 //Color Definition
-var colore = d3.scaleOrdinal(d3.schemeCategory10) //Color just for services
+var colore = d3.scaleOrdinal(d3.schemeCategory20) //Color just for services
 ck = d3.scaleOrdinal(d3.schemeCategory20c)
 var colorg = {"MASCULINO": "#316395", "FEMENINO": "#ff9896", "EJERCITO 2017": "#8FBC8F",
               "FAC  FUERZA AEREA COLOMBIANA": "#778899", "ARMADA NACIONAL": "#1E90FF",
